@@ -7,29 +7,16 @@ import pandas as pd
 #paths to data
 RVpath = './data22_RV_info.dat'
 LCpath = './data22_OGLE.dat'
-# initialize data arrays
-'''
-HJD=[] # heliocentric julian date
-I_band=[] # I-band magnitudes
-I_Err=[] # error in magnitudes
-'''
 #read lc data
 df_phot = pd.read_csv(LCpath, sep='\s', engine='python')
 HJD = np.array(df_phot['HJD'])
 I_band = np.array(df_phot['I_band'])
 I_Err = np.array(df_phot['I_Err'])
-'''
-with open(LCpath) as f:
-    for line in f:
-        temp=line.split()
-        HJD.append(np.float(temp[0]))
-        I_band.append(np.float(temp[1]))
-        I_Err.append(np.float(temp[2]))
-'''
+
 maxtime=HJD[-1]-HJD[0]
 mintime = np.min(np.diff(HJD))
-print(maxtime)
-print(mintime)
+print('Maximum time between observations:' +str(maxtime) +' and minimum time: ' +str(mintime) + ' in days.')
+
 # freq, theta = pdm(time, mags, f_min=0.002, f_max=10, delf=1e-3)
 freq, theta = pdm(HJD, I_band, I_Err, f_min=2/maxtime, f_max=2/mintime, delf=1e-3)
 print(f'      Best Period = {1/freq[np.argmin(theta)]:.8f}', 'd')
@@ -46,11 +33,7 @@ ax2.set_ylabel('1-Theta')
 ax3.plot(1/freq, 1-theta, 'magenta')
 ax3.set(xlabel='Period (days)', ylabel='1-Theta');
 plt.xscale('log')
-#bins=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500]
-#tickLabels = map(str, bins)
-#ax3.set_xticks(bins)
-#ax3.set_xticklabels(tickLabels)
-#
+
 peaks2, _ = find_peaks(1-theta, height=0.04, distance=100)
 peri2 = 1/freq[peaks2]
 print('Possible periods: ', peri2)
@@ -58,8 +41,6 @@ ax2.plot(freq[peaks2], 1-theta[peaks2], "ob")
 ax3.plot(1/freq[peaks2], 1-theta[peaks2], "ob")
 #
 plt.tight_layout()
-
-plt.show()
 
 P1 = 21.906044973#1/freq[np.argmin(theta)]
 phase = [ x/P1 % 1 for x in HJD]
