@@ -22,19 +22,19 @@ freq, theta = pdm(HJD, I_band, I_Err, f_min=2/maxtime, f_max=2/mintime, delf=1e-
 print(f'      Best Period = {1/freq[np.argmin(theta)]:.8f}', 'd')
 
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 8))
-ax1.plot(HJD, I_band, '.', c='magenta')
+ax1.plot(HJD, I_band, '.', c='orange')
 ax1.set_xlabel('Time')
 ax1.set_ylabel('Mag')
 #
-ax2.plot(freq, 1-theta, 'magenta')
+ax2.plot(freq, 1-theta, 'orange')
 ax2.set_xlabel('Frequency')
 ax2.set_ylabel('1-Theta')
 #
-ax3.plot(1/freq, 1-theta, 'magenta')
+ax3.plot(1/freq, 1-theta, 'orange')
 ax3.set(xlabel='Period (days)', ylabel='1-Theta');
 plt.xscale('log')
 
-peaks2, _ = find_peaks(1-theta, height=0.04, distance=100)
+peaks2, _ = find_peaks(1-theta, height=0.06, distance=100)
 peri2 = 1/freq[peaks2]
 print('Possible periods: ', peri2)
 ax2.plot(freq[peaks2], 1-theta[peaks2], "ob")
@@ -42,12 +42,13 @@ ax3.plot(1/freq[peaks2], 1-theta[peaks2], "ob")
 #
 plt.tight_layout()
 
-P1 = 21.906044973#1/freq[np.argmin(theta)]
+P1 = 21.906044973#1/freq[np.argmin(theta)], is 13 * 1.685 ... one of the peaks
 phase = [ x/P1 % 1 for x in HJD]
 df_phot['phase'] = phase
 df_phase = df_phot.sort_values('phase', ascending=True).reset_index(drop=True)
 fig, ax = plt.subplots(figsize=(6, 4))
 plt.plot(df_phase['phase'], df_phase['I_band'], '.', c='magenta', ms=6, label='data')
+print(find_peaks(df_phase['I_band']))
 ax.set(xlabel='Phase', ylabel='Magnitude')
 plt.tight_layout()
 plt.show()
