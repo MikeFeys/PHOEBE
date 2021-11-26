@@ -40,15 +40,26 @@ print('Possible periods: ', peri2)
 ax2.plot(freq[peaks2], 1-theta[peaks2], "ob")
 ax3.plot(1/freq[peaks2], 1-theta[peaks2], "ob")
 #
+per=np.append(peri2, peri2[1]*13*)#Possibly also alias?
+print(peri2)
 plt.tight_layout()
-
-P1 = 21.906044973#1/freq[np.argmin(theta)], is 13 * 1.685 ... one of the peaks
-phase = [ x/P1 % 1 for x in HJD]
-df_phot['phase'] = phase
-df_phase = df_phot.sort_values('phase', ascending=True).reset_index(drop=True)
-fig, ax = plt.subplots(figsize=(6, 4))
-plt.plot(df_phase['phase'], df_phase['I_band'], '.', c='magenta', ms=6, label='data')
-print(find_peaks(df_phase['I_band']))
-ax.set(xlabel='Phase', ylabel='Magnitude')
-plt.tight_layout()
+for P1 in per:
+    if P1 == per[-1]:#do some fitting or something here? + need to plot errors also
+        phase = [ x/P1 % 1 for x in HJD]
+        df_phot['phase'] = phase
+        df_phase = df_phot.sort_values('phase', ascending=True).reset_index(drop=True)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        plt.plot(df_phase['phase'], df_phase['I_band'], '.', c='magenta', ms=6, label='Period='+str(format(P1,".3f"))+' days')
+        ax.set(xlabel='Phase', ylabel='Flux [magn.]',title='Phased photometry based on PDM results')
+        plt.legend(loc='upper right',shadow=True)
+        plt.tight_layout()
+    else:#Just do normal plots
+        phase = [ x/P1 % 1 for x in HJD]
+        df_phot['phase'] = phase
+        df_phase = df_phot.sort_values('phase', ascending=True).reset_index(drop=True)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        plt.plot(df_phase['phase'], df_phase['I_band'], '.', c='magenta', ms=6, label='Period='+str(format(P1,".3f"))+' days')
+        ax.set(xlabel='Phase', ylabel='Flux [magn.]',title='Phased photometry based on PDM results')
+        plt.legend(loc='upper right',shadow=True)
+        plt.tight_layout()
 plt.show()

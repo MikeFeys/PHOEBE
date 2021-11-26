@@ -47,7 +47,6 @@ for i in range(len(period_cand)):
                 fluxes=I_band,
                 sigmas = I_err,
                 dataset='lc01')
-
     b.set_value_all('ld_mode','lookup')
 
     if saving == True:
