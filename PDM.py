@@ -40,8 +40,8 @@ print('Possible periods: ', peri2)
 ax2.plot(freq[peaks2], 1-theta[peaks2], "ob")
 ax3.plot(1/freq[peaks2], 1-theta[peaks2], "ob")
 #
-per=np.append(peri2, peri2[1]*13*)#Possibly also alias?
-print(peri2)
+per=np.append(peri2, peri2[1]*13*2)#Possibly also alias?
+print(peri2,peri2[1]*13)
 plt.tight_layout()
 for P1 in per:
     if P1 == per[-1]:#do some fitting or something here? + need to plot errors also
@@ -50,6 +50,7 @@ for P1 in per:
         df_phase = df_phot.sort_values('phase', ascending=True).reset_index(drop=True)
         fig, ax = plt.subplots(figsize=(6, 4))
         plt.plot(df_phase['phase'], df_phase['I_band'], '.', c='magenta', ms=6, label='Period='+str(format(P1,".3f"))+' days')
+        print(np.mean(df_phase['I_band']))
         ax.set(xlabel='Phase', ylabel='Flux [magn.]',title='Phased photometry based on PDM results')
         plt.legend(loc='upper right',shadow=True)
         plt.tight_layout()
