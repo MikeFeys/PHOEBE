@@ -11,8 +11,18 @@ RVpath = './data22_RV_info.dat'
 LCpath = './data22_OGLE.dat'
 period_cand = [21.90611124037] #in days
 
-def to_flux(mag_array):
-    flux_array = np.power(10*np.ones(len(mag_array)),-(mag_array-15.275)/2.5) #use mean of fluxes for zero point when converting, eclipse will be down now
+def to_flux(mag_array,errs,boolean):
+    flux_array=[]
+    flux_arrayerr1=[]
+    flux_arrayerr2=[]
+    if boolean:
+        for i,j in zip(mag_array,errs):
+            flux_arrayerr1.append(np.power(10,-((i-j)-15.275)/2.5)) #use mean of fluxes for zero point when converting, eclipse will be down now
+            flux_arrayerr2.append(np.power(10,-((i+j)-15.275)/2.5))
+        flux_array=[(a-b)/2 for a,b in zip(flux_arrayerr1,flux_arrayerr2)]
+    else:
+        for i in mag_array:
+            flux_array.append(np.power(10,-(i-15.275)/2.5)) #use mean of fluxes for zero point when converting, eclipse will be down now
     return flux_array
 
 #read data
@@ -29,32 +39,18 @@ with open(LCpath) as f:
             HJD.append(float(temp[0]))
             I_band.append(float(temp[1]))
             I_err.append(float(temp[2]))
-
-
-#I_band = to_flux(np.array(I_band))
-#I_err = to_flux(np.array(I_err))
-#I_err = np.zeros(len(I_band))
-#Get min mass companion from binary mass function, https://astronomy.swin.edu.au/cosmos/b/Binary+Mass+Function
-fm1m2=(21.90611124037*86400*(69.7e3)**3 /(2* np.pi * 6.67e-11*1.9891e30))
-rv=137/69.7
-m2=(1+rv)*fm1m2
-m1=rv*m2
-print('Mass1=',m1, '\n'+'Mass2=',m2)
 saving = False
-
 for i in range(len(period_cand)):
     b = phoebe.default_binary()
-
     b.set_value('latex_repr', component='binary', value = 'orb')
     b.set_value('latex_repr', component='primary', value = '1')
     b.set_value('latex_repr', component='secondary', value = '2')
     b.set_value('period@binary', period_cand[i]*u.d)
-
     b.add_dataset('lc',
                 compute_phases=phoebe.linspace(0,1,201),
                 times=HJD,
-                fluxes=I_band,
-                sigmas = I_err,
+                fluxes=to_flux(I_band,I_err,False),
+                sigmas = to_flux(I_band,I_err,True),
                 dataset='lc01')
     b.set_value_all('ld_mode','lookup')
     #From the jupyter demonstration,
