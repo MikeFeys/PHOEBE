@@ -52,6 +52,7 @@ for i in range(len(period_cand)):
                 fluxes=to_flux(I_band,I_err,False),
                 sigmas = to_flux(I_band,I_err,True),
                 dataset='lc01')
+    b.set_value_all('ld_mode','lookup')
     #From the jupyter demonstration,
     #How to estimate M1 mass ???
     print(b.filter(dataset='lc01').contexts)
