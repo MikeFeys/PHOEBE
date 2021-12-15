@@ -34,7 +34,12 @@ with open(LCpath) as f:
 #I_band = to_flux(np.array(I_band))
 #I_err = to_flux(np.array(I_err))
 #I_err = np.zeros(len(I_band))
-
+#Get min mass companion from binary mass function, https://astronomy.swin.edu.au/cosmos/b/Binary+Mass+Function
+fm1m2=(21.90611124037*86400*(69.7e3)**3 /(2* np.pi * 6.67e-11*1.9891e30))
+rv=137/69.7
+m2=(1+rv)*fm1m2
+m1=rv*m2
+print('Mass1=',m1, '\n'+'Mass2=',m2)
 saving = False
 
 for i in range(len(period_cand)):
