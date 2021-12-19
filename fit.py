@@ -45,19 +45,26 @@ plt.tight_layout()
 plt.show()
 plt.close()
 '''
+
 # convert mag to flux [this is possibly still wrong]
 
-def to_flux(mag_array):
-    flux_array = np.power(10*np.ones(len(mag_array)),(-22.614 - mag_array/2.5))
+def to_flux(mag_array,errs,boolean):
+    flux_array=[]
+    flux_arrayerr1=[]
+    flux_arrayerr2=[]
+    if boolean:
+        for i,j in zip(mag_array,errs):
+            flux_arrayerr1.append(np.power(10,-((i-j)-15.275)/2.5)) #use mean of fluxes for zero point when converting, eclipse will be down now
+            flux_arrayerr2.append(np.power(10,-((i+j)-15.275)/2.5))
+        flux_array=[(a-b)/2 for a,b in zip(flux_arrayerr1,flux_arrayerr2)]
+    else:
+        for i in mag_array:
+            flux_array.append(np.power(10,-(i-15.275)/2.5)) #use mean of fluxes for zero point when converting, eclipse will be down now
     return flux_array
 
+flux = to_flux(mag,err,False)
+err = to_flux(mag,err,True)
 
-print(max(mag))
-print(max(err))
-flux = to_flux(mag)
-err = to_flux(err)
-print(max(flux))
-print(max(err))
 
 #init logger and binary package
 
@@ -72,7 +79,19 @@ b.add_dataset('lc', times=time,
                     sigmas=err,
                     dataset='lc01')
 
-#b.set_value('pblum-mode', value='dataset-scaled')
+print(b.filter(dataset='lc01', context='dataset').qualifiers)
+
+b.set_value_all('atm', 'blackbody')
+b.set_value_all('ld_mode', 'manual')
+b.set_value_all('ld_coeffs', [0.5, 0.5])
+b.set_value_all('ld_mode_bol', 'manual')
+b.set_value_all('ld_coeffs_bol', [0.5, 0.5])
+
+b.set_value('latex_repr', component='binary', value = 'orb')
+b.set_value('latex_repr', component='primary', value = '1')
+b.set_value('latex_repr', component='secondary', value = '2')
+
+b.set_value('pblum_mode', dataset='lc01' , context='dataset',value='dataset-scaled')
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
