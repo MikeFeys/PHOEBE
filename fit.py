@@ -46,7 +46,7 @@ plt.show()
 plt.close()
 '''
 
-# convert mag to flux [this is possibly still wrong]
+# convert mag to flux
 
 def to_flux(mag_array,errs,boolean):
     flux_array=[]
@@ -79,13 +79,15 @@ b.add_dataset('lc', times=time,
                     sigmas=err,
                     dataset='lc01')
 
-print(b.filter(dataset='lc01', context='dataset').qualifiers)
+#print(b.filter(dataset='lc01', context='dataset').qualifiers)
 
+#alter settings
 b.set_value_all('atm', 'blackbody')
 b.set_value_all('ld_mode', 'manual')
 b.set_value_all('ld_coeffs', [0.5, 0.5])
 b.set_value_all('ld_mode_bol', 'manual')
 b.set_value_all('ld_coeffs_bol', [0.5, 0.5])
+
 
 b.set_value('latex_repr', component='binary', value = 'orb')
 b.set_value('latex_repr', component='primary', value = '1')
@@ -95,10 +97,33 @@ b.set_value('pblum_mode', dataset='lc01' , context='dataset',value='dataset-scal
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
-b.set_value(qualifier='asini', component='binary', context='component', value=asini)
+#b.set_value(qualifier='asini', component='binary', context='component', value=asini)
 
-# plot model
+#add and run solvers
+b.add_solver('estimator.lc_geometry',
+             lc_datasets='lc01')
+
+b.run_solver(kind='lc_geometry', solution='lc_geom_sol')
+print(b.adopt_solution('lc_geom_sol', trial_run=True))
+b.adopt_solution('lc_geom_sol')
+
+'''
+b.add_solver('estimator.ebai',
+             lc_datasets='lc01')
+b.run_solver(kind='ebai', solution='ebai_sol')
+print(b.adopt_solution('ebai_sol', trial_run=True))
+
+b.flip_constraint('teffratio', solve_for='teff@primary')
+b.flip_constraint('requivsumfrac', solve_for='requiv@primary')
+b.adopt_solution('ebai_sol', adopt_parameters=['teffratio', 'requivsumfrac', 'incl'])
+'''
+# plot flux data
 afig, mplfig = b.plot(x='phases', show=True)
+plt.close()
+
+
 
 # run model
-b.run_compute()
+b.run_compute(irrad_method='none', model='after_estimators', overwrite=True)
+
+b.plot(x='phases', m='.', show=True)
