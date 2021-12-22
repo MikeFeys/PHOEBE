@@ -79,7 +79,6 @@ b.add_dataset('lc', times=time,
                     sigmas=err,
                     dataset='lc01')
 
-#print(b.filter(dataset='lc01', context='dataset').qualifiers)
 
 #alter settings
 b.set_value_all('atm', 'blackbody')
@@ -102,7 +101,7 @@ b.set_value(qualifier='asini', component='binary', context='component', value=as
 afig, mplfig = b.plot(x='phases', m='.', show=True)
 plt.close()
 
-
+print(b.filter(context='component'))
 
 # run model
 b.set_value('pblum_mode', dataset='lc01' , context='dataset',value='dataset-scaled')
@@ -111,32 +110,13 @@ b.run_compute(model='default')
 _ = b.plot(x='phases', m='.', show=True)
 
 
-# add estimators
-#ebai
-b.add_solver('estimator.ebai', solver='ebai01')
-b.run_solver('ebai01', solution='ebai_solution')
-
-#fix ebai constraints
-
-b.flip_constraint('requivsumfrac', solve_for='requiv@secondary')
-b.flip_constraint('teffratio', solve_for='teff@secondary')
-
-b.flip_constraint('esinw', solve_for='ecc')
-b.flip_constraint('ecosw', solve_for='per0')
-
+# add estimator
 #lcgeom
 b.add_solver('estimator.lc_geometry', solver='lcgeom')
 b.run_solver('lcgeom', solution='lcgeom_solution')
 
-#fix lc_geom constraints
-b.flip_constraint('per0', solve_for='ecosw')
-b.flip_constraint('ecc', solve_for='esinw')
+print(b.adopt_solution('lcgeom_solution'))
 
-
-
-#recompute with ebai
-b.run_compute(model='ebai_model')
-_ = b.plot(x='phase', ls='-', legend=True, show=True)
 #recompute with lc_geom
 b.run_compute(model='lcgeom_model')
-_ = b.plot(x='phases', ls='-', legend=True, show=True)
+_ = b.plot(x='phases', ls='-', m='.', legend=True, show=True)
