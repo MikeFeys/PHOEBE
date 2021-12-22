@@ -84,21 +84,22 @@ b.add_dataset('lc', times=time,
 #alter settings
 b.set_value_all('atm', 'blackbody')
 b.set_value_all('ld_mode', 'manual')
-b.set_value_all('ld_coeffs', [0.5, 0.5])
 b.set_value_all('ld_mode_bol', 'manual')
-b.set_value_all('ld_coeffs_bol', [0.5, 0.5])
+
 
 
 b.set_value('latex_repr', component='binary', value = 'orb')
 b.set_value('latex_repr', component='primary', value = '1')
 b.set_value('latex_repr', component='secondary', value = '2')
 
-b.set_value('pblum_mode', dataset='lc01' , context='dataset',value='dataset-scaled')
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
+
+print(b.get_parameter(qualifier='period', component='binary', context='component'))
+
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
-#b.set_value(qualifier='asini', component='binary', context='component', value=asini)
-
+b.set_value(qualifier='asini', component='binary', context='component', value=asini)
+'''
 #add and run solvers
 b.add_solver('estimator.lc_geometry',
              lc_datasets='lc01')
@@ -106,7 +107,7 @@ b.add_solver('estimator.lc_geometry',
 b.run_solver(kind='lc_geometry', solution='lc_geom_sol')
 print(b.adopt_solution('lc_geom_sol', trial_run=True))
 b.adopt_solution('lc_geom_sol')
-
+'''
 '''
 b.add_solver('estimator.ebai',
              lc_datasets='lc01')
@@ -118,12 +119,31 @@ b.flip_constraint('requivsumfrac', solve_for='requiv@primary')
 b.adopt_solution('ebai_sol', adopt_parameters=['teffratio', 'requivsumfrac', 'incl'])
 '''
 # plot flux data
-afig, mplfig = b.plot(x='phases', show=True)
+afig, mplfig = b.plot(x='phases', m='.', show=True)
 plt.close()
 
 
 
 # run model
-b.run_compute(irrad_method='none', model='after_estimators', overwrite=True)
+b.set_value('pblum_mode', dataset='lc01' , context='dataset',value='dataset-scaled')
+b.run_compute(model='default')
 
-b.plot(x='phases', m='.', show=True)
+_ = b.plot(x='phases', m='.', show=True)
+
+
+# add estimator
+b.add_solver('estimator.ebai', solver='ebai01')
+b.run_solver('ebai01', solution='ebai_solution')
+try:
+    b.adopt_solution('ebai_solution')
+except Exception as e:
+    print(e)
+
+b.flip_constraint('requivsumfrac', solve_for='requiv@secondary')
+
+b.flip_constraint('teffratio', solve_for='teff@secondary')
+b.flip_constraint('esinw', solve_for='ecc')
+b.flip_constraint('ecosw', solve_for='per0')
+
+b.run_compute(model='ebai_model')
+_ = b.plot(x='phase', ls='-', legend=True, show=True)
