@@ -94,30 +94,10 @@ b.set_value('latex_repr', component='secondary', value = '2')
 
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
 
-print(b.get_parameter(qualifier='period', component='binary', context='component'))
-
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
 b.set_value(qualifier='asini', component='binary', context='component', value=asini)
-'''
-#add and run solvers
-b.add_solver('estimator.lc_geometry',
-             lc_datasets='lc01')
 
-b.run_solver(kind='lc_geometry', solution='lc_geom_sol')
-print(b.adopt_solution('lc_geom_sol', trial_run=True))
-b.adopt_solution('lc_geom_sol')
-'''
-'''
-b.add_solver('estimator.ebai',
-             lc_datasets='lc01')
-b.run_solver(kind='ebai', solution='ebai_sol')
-print(b.adopt_solution('ebai_sol', trial_run=True))
-
-b.flip_constraint('teffratio', solve_for='teff@primary')
-b.flip_constraint('requivsumfrac', solve_for='requiv@primary')
-b.adopt_solution('ebai_sol', adopt_parameters=['teffratio', 'requivsumfrac', 'incl'])
-'''
 # plot flux data
 afig, mplfig = b.plot(x='phases', m='.', show=True)
 plt.close()
@@ -131,19 +111,32 @@ b.run_compute(model='default')
 _ = b.plot(x='phases', m='.', show=True)
 
 
-# add estimator
+# add estimators
+#ebai
 b.add_solver('estimator.ebai', solver='ebai01')
 b.run_solver('ebai01', solution='ebai_solution')
-try:
-    b.adopt_solution('ebai_solution')
-except Exception as e:
-    print(e)
+
+#fix ebai constraints
 
 b.flip_constraint('requivsumfrac', solve_for='requiv@secondary')
-
 b.flip_constraint('teffratio', solve_for='teff@secondary')
+
 b.flip_constraint('esinw', solve_for='ecc')
 b.flip_constraint('ecosw', solve_for='per0')
 
+#lcgeom
+b.add_solver('estimator.lc_geometry', solver='lcgeom')
+b.run_solver('lcgeom', solution='lcgeom_solution')
+
+#fix lc_geom constraints
+b.flip_constraint('per0', solve_for='ecosw')
+b.flip_constraint('ecc', solve_for='esinw')
+
+
+
+#recompute with ebai
 b.run_compute(model='ebai_model')
 _ = b.plot(x='phase', ls='-', legend=True, show=True)
+#recompute with lc_geom
+b.run_compute(model='lcgeom_model')
+_ = b.plot(x='phases', ls='-', legend=True, show=True)
