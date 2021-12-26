@@ -96,7 +96,7 @@ b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
 b.set_value(qualifier='asini', component='binary', context='component', value=asini)
-
+b.set_value(qualifier='q', component='binary', context='component', value=69.7/137)
 # plot flux data
 afig, mplfig = b.plot(x='phases', m='.', show=True)
 plt.close()
@@ -120,3 +120,7 @@ print(b.adopt_solution('lcgeom_solution'))
 #recompute with lc_geom
 b.run_compute(model='lcgeom_model')
 _ = b.plot(x='phases', ls='-', m='.', legend=True, show=True)
+print(b.adopt_solution('lcgeom_solution'))
+print(b.filter(context='component'))
+print(b.get_parameter(qualifier='mass', component='primary', context='component'))
+print(b.get_parameter(qualifier='sma', component='binary', context='component'))
