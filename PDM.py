@@ -11,7 +11,7 @@ LCpath = './data22_OGLE.dat'
 df_phot = pd.read_csv(LCpath, sep='\s', engine='python')
 HJD = np.array(df_phot['HJD'])
 I_band = np.array(df_phot['I_band'])
-I_Err = np.array(df_phot['I_Err'])
+I_Err = np.array(df_phot['I_err'])
 
 maxtime=HJD[-1]-HJD[0]
 mintime = np.min(np.diff(HJD))

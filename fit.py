@@ -94,7 +94,8 @@ b.set_value('latex_repr', component='primary', value = '1')
 b.set_value('latex_repr', component='secondary', value = '2')
 
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
-
+b.set_value('teff', component='primary', value=50000)
+b.set_value('teff', component='secondary', value=29000)
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.set_value(qualifier='q', component = 'binary', context='component', value= q )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
@@ -129,7 +130,7 @@ print(b.filter(context='component'))
 #add optimizer
 b.add_solver('optimizer.nelder_mead', solver='nm_solver')
 b.set_value('compute', solver='nm_solver', value='phoebe01')
-b.set_value('maxiter', 1000)
+b.set_value('maxiter', 100)
 b.set_value('maxfev', 1000)
 
 b.set_value('fit_parameters', ['q', 'ecc'])
@@ -139,7 +140,7 @@ b.run_solver('nm_solver', solution='nm_sol')
 print(b.filter(solution='nm_sol'))
 print(b.adopt_solution(trial_run=True))
 
-b.run_compute(compute='phoebe01', sample_from='nm_sol', model='nm_model')
+#b.run_compute(compute='phoebe01', sample_from='nm_sol', model='nm_model')
 _ = b.plot(kind='lc', x='phases',
            linestyle={'model': 'solid'},
            color={'nm_model': 'red', 'model_orig': 'green'},
