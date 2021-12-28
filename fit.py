@@ -94,17 +94,24 @@ b.set_value('latex_repr', component='primary', value = '1')
 b.set_value('latex_repr', component='secondary', value = '2')
 
 b.set_value(qualifier='compute_times', dataset='lc01', context='dataset', value=np.linspace(time[0], time[-1], 200))
-b.set_value('teff', component='primary', value=50000)
-b.set_value('teff', component='secondary', value=29000)
+#b.set_value('teff', component='primary', value=50000)
+#b.set_value('teff', component='secondary', value=29000)
+#b.set_value('gravb_bol', component='primary', value=0.9)
+#b.set_value('gravb_bol', component='secondary', value=0.9)
+#b.set_value('irrad_frac_refl_bol', component='primary', value=1)
+#b.set_value('irrad_frac_refl_bol', component='secondary', value=1)
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.set_value(qualifier='q', component = 'binary', context='component', value= q )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
 b.set_value(qualifier='asini', component='binary', context='component', value=asini)
 b.set_value(qualifier='q', component='binary', context='component', value=69.7/137)
+b.set_value(qualifier='incl', component = 'binary', context='component', value= 90 )
+
+'''
 # plot flux data
 afig, mplfig = b.plot(x='phases', m='.', show=True)
 plt.close()
-
+'''
 print(b.filter(context='component'))
 
 # run model
@@ -128,6 +135,8 @@ _ = b.plot(x='phases', ls='-', m='.', legend=True, show=True)
 print(b.filter(context='component'))
 print(b.get_parameter(qualifier='mass', component='primary', context='component'))
 print(b.get_parameter(qualifier='sma', component='binary', context='component'))
+
+'''
 #add optimizer
 b.add_solver('optimizer.nelder_mead', solver='nm_solver')
 b.set_value('compute', solver='nm_solver', value='phoebe01')
@@ -140,9 +149,4 @@ b.run_solver('nm_solver', solution='nm_sol')
 
 print(b.filter(solution='nm_sol'))
 print(b.adopt_solution(trial_run=True))
-
-#b.run_compute(compute='phoebe01', sample_from='nm_sol', model='nm_model')
-#_ = b.plot(kind='lc', x='phases',
-#           linestyle={'model': 'solid'},
-#           color={'nm_model': 'red', 'model_orig': 'green'},
-#           show=True)
+'''
