@@ -16,8 +16,8 @@ K2err = 34
 q = K1/K2
 
 # estimate asini in case of e=0
-a1sini = np.sqrt(1-e**2)/(2*np.pi)*K1*P
-a2sini = np.sqrt(1-e**2)/(2*np.pi)*K2*P
+a1sini = np.sqrt(1-e**2)/(2*np.pi)*K1*P*86400/695700
+a2sini = np.sqrt(1-e**2)/(2*np.pi)*K2*P*86400/695700
 
 asini = a1sini + a2sini
 
