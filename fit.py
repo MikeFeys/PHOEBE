@@ -103,6 +103,7 @@ b.set_value('irrad_frac_refl_bol', component='secondary', value=1)
 
 b.set_value(qualifier='period', component = 'binary', context='component', value= P )
 b.set_value(qualifier='q', component = 'binary', context='component', value= q )
+b.set_value(qualifier='incl', component = 'binary', context='component', value= 90 )
 b.flip_constraint('asini@binary', solve_for='sma@binary')
 b.set_value(qualifier='asini', component='binary', context='component', value=asini)
 b.set_value(qualifier='q', component='binary', context='component', value=69.7/137)
